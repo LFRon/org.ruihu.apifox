@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Apifox
+Exec=/opt/apps/org.ruihu.apifox/files/bin/org.ruihu.apifox %U
+Terminal=false
+Icon=apifox
+StartupWMClass=Apifox
+Comment=Apifox = Postman + Swagger + Mock + Test
+Categories=Office;Network;Utility;

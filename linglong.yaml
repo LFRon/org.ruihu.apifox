@@ -1,0 +1,63 @@
+version: "1"
+
+package:
+  id: org.ruihu.apifox
+  name: ApiFox
+  version: 2.7.49.0
+  kind: app
+  description: |
+    ApiFox是一款强大的API后端一体化协作平台,这是其Linux原生版本
+
+base: org.deepin.base/25.2.1
+runtime: 
+##Add GTK3 & GTK4 Fcitx5-Frontend
+command:
+  - "/opt/apps/org.ruihu.apifox/files/bin/org.ruihu.apifox"
+
+sources:
+    - kind: file
+      url: https://file-assets.apifox.com/download/Apifox-linux-latest.zip
+      digest: b530369ca3c1234248956c80329c129181ab0ea6d402e0776ab3ce64395fbea4
+
+build: |
+    ## 环境设置
+    set -x
+    export PATH=$PATH:/usr/libexec/linglong/builder/helper
+    # 设置工作目录
+    SOURCES="linglong/app-sources"
+    # 设置启动二进制文件名称
+    BINNAME=${LINGLONG_APPID}
+    # 进入工作目录
+    cd ${SOURCES}
+
+    # 清理过时的lib库并进行重建
+    rm -rf libs && mkdir libs
+
+    # 将AppImage挪过来并进行解压
+    mv ../sources/*.zip target.zip
+    # 解压zip得到AppImage
+    unzip target.zip
+    chmod +x Apifox.AppImage && ./Apifox.AppImage --appimage-extract
+
+    # 进入squash-root应用本体目录
+    cd squashfs-root
+    # 拷贝必需libs库
+    cp -a usr/lib/* ../libs
+    # 删除多余文件
+    rm -rf .DirIcon AppRun apifox.desktop apifox.png usr
+
+    # 退出squashfs-root目录并重命名
+    cd .. && mv squashfs-root ${LINGLONG_APPID}
+    # 删除多余的AppImage文件
+    rm -f Apifox.AppImage target.zip
+
+    #写入启动脚本
+    echo "#!/bin/bash" > bin/${BINNAME}
+    echo "exec \"${PREFIX}/${LINGLONG_APPID}/apifox\" \"--no-sandbox\" \"\$@\"" >> bin/${BINNAME}
+    chmod -R 755 *
+
+    #进行安装
+    cp -a bin $PREFIX
+    cp -a ${LINGLONG_APPID} $PREFIX
+    cp -a share $PREFIX
+    cp -a libs $PREFIX/lib

@@ -1,0 +1,2 @@
+#!/bin/bash
+exec "/opt/apps/org.ruihu.apifox/files/org.ruihu.apifox/apifox" "--no-sandbox" "$@"
